@@ -1,0 +1,65 @@
+package pt.unl.fct.di.iadidemo.security.config
+
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import pt.unl.fct.di.iadidemo.security.application.services.UserService
+
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+class SecurityConfig(
+    val customUserDetails:CustomUserDetailsService,
+    val users: UserService
+) : WebSecurityConfigurerAdapter() {
+
+    override fun configure(http: HttpSecurity) {
+        http.csrf().disable() // This allows applications to access endpoints from any source location
+            .authorizeRequests()
+            .antMatchers("/user/books").permitAll() //only get should be allowed
+            .antMatchers("/admin/**").hasRole("ADMIN")
+            .antMatchers("/user/**").authenticated()
+            .anyRequest().authenticated()
+            .and().httpBasic()
+            // Missing the sign-up, sign-in and sign-out endpoints
+            // Missing the configuration for filters
+            .and()
+            .addFilterBefore(UserPasswordAuthenticationFilterToJWT ("/login",
+                super.authenticationManagerBean(), users),
+                BasicAuthenticationFilter::class.java)
+            .addFilterBefore(UserPasswordSignUpFilterToJWT ("/signup", users),
+                BasicAuthenticationFilter::class.java)
+            .addFilterBefore(UserPasswordSignOutFilterToJWT("/signout", users, super.authenticationManagerBean()),
+                BasicAuthenticationFilter::class.java)
+            .addFilterBefore(JWTAuthenticationFilter(users),
+                BasicAuthenticationFilter::class.java)
+
+    }
+
+    override fun configure(auth: AuthenticationManagerBuilder) {
+        auth
+            // To declare two users with
+            .inMemoryAuthentication()
+            .withUser("user")
+            .password(BCryptPasswordEncoder().encode("password"))
+            .roles("USER")
+
+            .and()
+            .withUser("admin")
+            .password(BCryptPasswordEncoder().encode("password"))
+            .roles("ADMIN")
+
+            // Set the way passwords are encoded in the system
+            .and()
+            .passwordEncoder(BCryptPasswordEncoder())
+
+            // Connect spring security to the domain/data model
+            .and()
+            .userDetailsService(customUserDetails)
+            .passwordEncoder(BCryptPasswordEncoder())
+    }
+}

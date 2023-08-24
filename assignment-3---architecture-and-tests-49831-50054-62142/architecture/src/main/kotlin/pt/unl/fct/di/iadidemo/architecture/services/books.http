@@ -1,0 +1,59 @@
+#### Get all books
+GET http://localhost:8080/books
+
+
+#### create book
+POST http://localhost:8080/books
+Content-Type: application/json
+
+{"title":  "TEST3"}
+
+
+#### Get book by id
+GET http://localhost:8080/books/1
+
+
+####  change book
+PUT http://localhost:8080/books/1
+Content-Type: application/json
+
+{"title":  "TEST2"}
+
+
+#### add review to book from user1
+POST http://localhost:8080/books/1/reviews
+Content-Type: application/json
+
+{
+  "message": "Review",
+  "rating": 9
+}
+
+
+#### Get Reviews of books with bookId
+GET http://localhost:8080/books/1/reviews
+
+
+#### Get specific review of books with bookId and reviewID
+GET http://localhost:8080/books/1/reviews/2
+
+
+####  change review
+PUT http://localhost:8080/books/1/reviews/2
+Content-Type: application/json
+
+{
+  "message": "Review changed",
+  "rating": 5
+}
+
+
+#### Delete specific review of books with bookId and reviewID
+DELETE http://localhost:8080/books/1/reviews/2
+
+
+#### Delete book
+DELETE http://localhost:8080/books/1
+
+
+

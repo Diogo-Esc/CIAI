@@ -1,0 +1,317 @@
+<html lang="en">
+
+<head>
+    <!-- Use only one file -->
+    <title>My Book List Home Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Place here your CSS rules */
+
+        section {
+            display: -webkit-flex;
+            display: flex;
+        }
+
+        h1 {
+            background-color: #000080;
+            padding: 26px;
+            margin: 0px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 100px;
+            background-color: #0000CD;
+            padding: 50px;
+            color: #FFFFFF;
+            margin: 0px;
+        }
+
+        h3 {
+            background-color: #000080;
+            color: #FFFFFF;
+            padding: 15px;
+            margin: 0px;
+
+        }
+
+        nav {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        nav a {
+            padding: 20px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .buttons {
+
+        }
+
+        .button_add_book {
+            height: 10px;
+        }
+
+        div {
+            font-size: 100%; 
+            display: table;
+            flex: 1;
+        }
+
+        body {
+            padding: 10px;
+            font-family: sans-serif;
+        }
+
+        .bookList {
+            -webkit-flex: 8;
+            -ms-flex: 8;
+            flex: 8;
+            margin: 0;
+            padding: 2%;
+        }
+
+        img {
+            width: 14%;
+            margin-right: 2%;
+        }
+
+        article {
+            background: white;
+            display: -webkit-flex;
+            display: flex;
+            margin-bottom: 3%;
+
+        }
+
+        span {
+            display: table-cell;
+            vertical-align: bottom;
+        }
+          
+        aside {
+            text-align: left;
+            -webkit-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            background-color: #FFFFE3;
+            padding: 10px;
+            height: min-content;
+        }
+
+        p {
+            font-weight: bold;
+        }
+
+        li {
+            list-style-type: none;
+            margin: 10px;
+        }
+
+        form {
+          width: 550px;
+          display: none;
+          flex-direction: column;
+          background-color: #eee;
+          padding: 10px;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%,-50%);
+          border: 1px solid #444;
+          border-radius: 15px;
+          z-index: 9;
+          box-shadow: 0px 0px 10px 3px;
+        }
+
+        form p {
+          margin: 0 auto;
+          font-size: 24px;
+
+        }
+
+        form label {
+          margin: 10px 0 5px;
+        }
+
+        form input {
+          border-radius: 5px;
+          font-size: 16px;
+          border: 1px solid #bbb;
+        }
+
+        form textarea {
+          resize: vertical;
+          border-radius: 5px;
+          font-size: 16px;
+          border: 1px solid #bbb;
+          font-family: sans-serif;
+        }
+
+        .form-btns {
+          margin-top: 15px;
+          display: flex;
+          justify-content: space-evenly;
+
+        }
+
+        footer {
+          background-color: #777;
+          display: flex;
+          justify-content: flex-start;
+          flex: 1 1 auto;
+        }
+
+        footer div {
+          display: flex;
+          flex-direction: column;
+        }
+
+        footer p {
+          margin: 10px;
+          color: #fff;
+          font-weight: normal;
+        }
+        
+    </style>
+    <script>
+        // Place here your JavaScript code
+        fetch('books.json')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+              if(localStorage.books != undefined){ // add local stored books if they exist
+                data = data.concat(JSON.parse(localStorage.books));
+              }
+              appendData(data);
+            })
+            .catch(function (err) {
+                console.log('error: ' + err);
+            });
+        //render Books
+        function appendData(data) {
+            var mainContainer = document.getElementById("myArticles");
+            for (var i = 0; i < data.length; i++) {
+                var art = document.createElement("article");
+                art.className="book";
+                art.innerHTML = '<img src="' + data[i].url + '"><div><span><p><big> ' + data[i].author +
+                    "</big></p><p>" + data[i].title + "</p> <p><small>" + 
+                    data[i].summary +
+                    "</small></p></span></div>";
+                mainContainer.appendChild(art);
+            }
+        }
+
+        function openForm() {
+            document.getElementById("add_book_form").style.display = "flex";
+        }
+
+        function closeForm() {
+            document.getElementById("add_book_form").style.display = "none";
+        }
+
+        function formSubmit(){
+          closeForm();
+          saveBook(document.getElementById('input_title').value,
+            document.getElementById('input_author').value,
+            document.getElementById('input_description').value,
+            document.getElementById('input_url').value);
+          document.getElementById("add_book_form").reset();
+        }
+
+        //save custom books to localStorage and render them
+        function saveBook(name, author, description, url){
+            let storedBooks = [];
+            if(localStorage.books != undefined){
+                storedBooks= JSON.parse(localStorage.books);
+            }
+            storedBooks.push({"title":name, "author":author, "summary": description, "url": url,})
+            localStorage.setItem("books", JSON.stringify(storedBooks));
+
+            //render the saved Book
+            appendData([JSON.parse(localStorage.books)[JSON.parse(localStorage.books).length-1]]);
+
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Place here your HTML code -->
+    <header>
+        <h1></h1>
+        <h2>My Book List</h2>
+        <h3>
+            <nav>
+              <div class="menus">
+                <a href="">Menu 1</a>
+                <a href="">Menu 2</a>
+                <a href="">Menu 3</a>
+              </div>
+              <div class="buttons">
+                <a form>
+                    <input type="text" name="search" id="search">
+                    <button type="button" id="button_search">Search</button>
+                </a>
+                <button type="button" id="button_add_book" onclick="openForm()">Add a book</button>
+              </div>
+            </nav>
+        </h3>
+    </header>
+
+
+
+    <section>
+        <div id="myArticles" class="bookList">
+        </div>
+        <aside>
+            <p>John Doe</p>
+            <li><a href="">Profile</a></li>
+            <li><a href="">Settings</a></li>
+            <p>Categories</p>
+            <li><a href="">Drama</a></li>
+            <li><a href="">Historical Novel</a></li>
+            <li><a href="">Science Fiction</a></li>
+            <p>Collections</p>
+            <li><a href="">Holidays Specials</a></li>
+            <li><a href="">All Timers</a></li>
+        </aside>
+    </section>
+
+    <form id="add_book_form"  action="javascript:formSubmit()">
+      <p>Add a book!</p>
+      <label for="title"><b>Title</b></label>
+      <input type="text" placeholder="Enter Title" name="title" id="input_title" required>
+      <label for="author"><b>Author</b></label>
+      <input type="author" placeholder="Enter Author" name="author" id="input_author" required>
+      <label for="description"><b>Description</b></label>
+      <textarea type="text" placeholder="Enter Description" name="description2" id="input_description" rows="5" required></textarea>
+      <label for="url"><b>Image Url</b></label>
+      <input type="url" placeholder="Enter Image Url" name="url" id="input_url" required>
+
+      <div class="form-btns">
+        <button type="submit" class="btn" >Save</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      </div>
+
+    </form>
+
+    <footer>
+      <ul class="contact">
+        <li> <p>Email: <a href="#">joe@somemail.somewhere</a></p></li>
+        <li> <p>Telephone number: <a href="#">555 888 333</a></p></li>
+
+      </ul>
+      <ul class="sections">
+        <li> <a href="#">Section 1</a></li>
+        <li> <a href="#">Section 2</a></li>
+        <li> <a href="#">Section 3</a></li>
+
+      </ul>
+    </footer>
+
+</body>
+
+</html>
