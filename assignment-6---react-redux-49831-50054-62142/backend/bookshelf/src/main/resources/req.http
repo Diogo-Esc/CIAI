@@ -1,0 +1,18 @@
+POST http://localhost:8080/user/books
+Content-Type: application/json
+
+{
+  "title": "Review",
+  "authors": [5],
+  "images": ["test"]
+}
+
+####
+
+GET http://localhost:8080/user/books
+
+
+###
+
+
+DELETE http://localhost:8080/user/books/6
